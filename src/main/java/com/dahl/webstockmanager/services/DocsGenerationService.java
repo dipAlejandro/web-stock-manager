@@ -1,5 +1,7 @@
 package com.dahl.webstockmanager.services;
 
+import com.dahl.webstockmanager.util.PDFDocGenerator;
+import com.dahl.webstockmanager.util.ExcelDocGenerator;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;

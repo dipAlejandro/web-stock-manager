@@ -1,4 +1,4 @@
-package com.dahl.webstockmanager.services;
+package com.dahl.webstockmanager.util;
 
 import com.dahl.webstockmanager.entities.Exportable;
 import com.opencsv.bean.CsvToBean;

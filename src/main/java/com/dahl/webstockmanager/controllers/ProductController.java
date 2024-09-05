@@ -73,6 +73,7 @@ public class ProductController {
                 model.addAttribute("suppliers", supplierService.getAllSuppliers());
                 return "products/new-product-form";
             } else {
+                
                 newProduct.setSupplier(supplierService.getSupplierById(intSupplierId));
                 productService.addProduct(newProduct);
                 redirectAttributes.addFlashAttribute("message", "Product added successfully!");

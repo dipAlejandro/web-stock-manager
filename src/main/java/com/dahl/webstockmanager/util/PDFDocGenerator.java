@@ -1,4 +1,4 @@
-package com.dahl.webstockmanager.services;
+package com.dahl.webstockmanager.util;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

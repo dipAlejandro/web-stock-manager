@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.dahl.webstockmanager.entities.Product;
 
 @Repository
-public interface ProductRepository extends CrudRepository<Product, Integer>  {
+public interface IProductRepository extends CrudRepository<Product, Integer>  {
 	
 }

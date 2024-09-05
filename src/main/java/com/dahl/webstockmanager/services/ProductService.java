@@ -7,15 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dahl.webstockmanager.entities.Product;
-import com.dahl.webstockmanager.repository.ProductRepository;
+import com.dahl.webstockmanager.repository.IProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class ProductService {
 
-    private ProductRepository repository;
+    private IProductRepository repository;
 
-    public ProductService(ProductRepository repo) {
+    public ProductService(IProductRepository repo) {
         this.repository = repo;
     }
 
@@ -55,6 +55,7 @@ public class ProductService {
         if (!repository.existsById(id)) {
             throw new EntityNotFoundException("Product with ID " + id + " not found");
         }
+
         repository.delete(getProductById(id));
     }
 }
