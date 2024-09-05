@@ -1,0 +1,37 @@
+@charset "UTF-8";
+
+/* Background gradients
+   All names were copied from https://uigradients.com/
+ */
+
+/*Moon Purple*/
+.bg-grad-0 {
+	/* Chrome 10-25, Safari 5.1-6 */
+	background: -webkit-linear-gradient(to right, #8f94fb, #4e54c8);
+	/* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+	background: linear-gradient(to right, #8f94fb, #4e54c8);
+}
+
+/*Hydrogen*/
+.bg-grad-1 {
+	/* Chrome 10-25, Safari 5.1-6 */
+	background: -webkit-linear-gradient(to right, #667db6, #0082c8, #0082c8, #667db6);
+	/* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+	background: linear-gradient(to right, #667db6, #0082c8, #0082c8, #667db6);
+}
+
+/*Crimsom Tide*/
+.bg-grad-2 {
+	/* Chrome 10-25, Safari 5.1-6 */
+	background: -webkit-linear-gradient(to right, #642b73, #c6426e);
+	/* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+	background: linear-gradient(to right, #642b73, #c6426e);
+}
+
+/* Vanusa */
+.bg-grad-3 {
+	background: -webkit-linear-gradient(to right, #89216B, #DA4453);
+	/* Chrome 10-25, Safari 5.1-6 */
+	background: linear-gradient(to right, #89216B, #DA4453);
+	/* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
