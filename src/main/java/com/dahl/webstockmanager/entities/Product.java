@@ -2,6 +2,7 @@ package com.dahl.webstockmanager.entities;
 
 import com.opencsv.bean.CsvBindAndJoinByName;
 import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvCustomBindByName;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -50,20 +51,23 @@ public class Product implements Exportable {
     private double price;
 
     @CreationTimestamp
-    @CsvBindByName(column = "created at")
+    @CsvCustomBindByName(column = "created at", converter = com.dahl.webstockmanager.util.LocalDateTimeConverter.class)
     private LocalDateTime createdAt;
     @UpdateTimestamp
-    @CsvBindByName(column = "last update")
+    @CsvCustomBindByName(column = "last update", converter = com.dahl.webstockmanager.util.LocalDateTimeConverter.class)
     private LocalDateTime updatedAt;
+    @CsvBindByName(column = "supplier id")
+    // Usado para relacionar el proveedor al importar desde .csv
+    private Integer tempSupplierId;
 
     @ManyToOne
     @JoinColumn(name = "supplier_id")
-    @CsvBindAndJoinByName(column = "supplier", elementType = Supplier.class)
+    //@CsvBindAndJoinByName(column = "supplier", elementType = Supplier.class)
     private Supplier supplier;
 
     public Product() {
     }
-
+    
     public Integer getId() {
         return id;
     }
@@ -134,6 +138,14 @@ public class Product implements Exportable {
 
     public void setSupplier(Supplier supplier) {
         this.supplier = supplier;
+    }
+
+    public Integer getTempSupplierId() {
+        return tempSupplierId;
+    }
+
+    public void setTempSupplierId(Integer tempSupplierId) {
+        this.tempSupplierId = tempSupplierId;
     }
 
     @Override

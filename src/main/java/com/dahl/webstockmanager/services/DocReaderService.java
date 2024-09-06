@@ -14,11 +14,11 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Service
 public class DocReaderService {
-
+    
     private final CSVReader csvReader;
     private final ProductService producService;
     private final SupplierService supplierService;
-
+    
     public DocReaderService(CSVReader csvReader, ProductService producService, SupplierService supplierService) {
         this.csvReader = csvReader;
         this.producService = producService;
@@ -28,26 +28,33 @@ public class DocReaderService {
     /**
      *
      * @param file
-     * @param withHeaders
-     * @return
+     * @param from
      */
-    public void readCsvAndPersist(MultipartFile file, Boolean withHeaders, String from) {
+    public void readCsvAndPersist(MultipartFile file, String from) {
         Class clazz;
         switch (from.toLowerCase()) {
-            case "prod":
+            case "products" -> {
                 clazz = Product.class;
-                List<Product> products = csvReader.read(file, withHeaders, clazz);
+                List<Product> products = csvReader.read(file, clazz);
                 // persist the information
                 for (Product p : products) {
+                    
+                    var supplier = supplierService.getSupplierById(p.getTempSupplierId());
+                    p.setSupplier(supplier);
+                    
                     producService.addProduct(p);
                 }
-                break;
-
-            case "supp":
+            }
+            
+            case "suppliers" -> {
                 clazz = Supplier.class;
-                List<Supplier> suppliers = csvReader.read(file, withHeaders, clazz);
-                break;
-            default:
+                List<Supplier> suppliers = csvReader.read(file, clazz);
+                // persist the information
+                for (Supplier s : suppliers) {
+                    supplierService.addSupplier(s);
+                }
+            }
+            default ->
                 throw new AssertionError();
         }
     }

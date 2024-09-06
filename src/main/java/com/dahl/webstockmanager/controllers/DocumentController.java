@@ -85,7 +85,6 @@ public class DocumentController {
 
         } catch (IOException e) {
             logger.error("Error while creating empty PDF", e);
-            e.printStackTrace();
         }
     }
 
@@ -126,21 +125,18 @@ public class DocumentController {
 
         } catch (IOException e) {
             logger.error("Error while creating empty Excel", e);
-            e.printStackTrace();
         }
     }
 
     @PostMapping("/import/csv")
-    public String uploadCsvFile(@RequestParam(value = "csvFile") MultipartFile file, @RequestParam("from") String from,
-            @RequestParam(value = "withHeaders", defaultValue = "false") Boolean withHeaders) {
+    public String uploadCsvFile(@RequestParam(value = "csvFile") MultipartFile file, @RequestParam("from") String from) {
 
         System.out.println("New file csv was uploaded");
-        System.out.println("With headers: " + withHeaders);
         System.out.println("From: " + from);
         System.out.println("With size: " + file.getSize());
-        
-        docReaderService.readCsvAndPersist(file, withHeaders, from);
-        
-        return "redirect:/products";
+
+        docReaderService.readCsvAndPersist(file, from);
+
+        return from.equals("products") ? "redirect:/products" : "redirect:/suppliers/show-all";
     }
 }

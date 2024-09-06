@@ -1,10 +1,10 @@
 package com.dahl.webstockmanager.entities;
 
-import com.opencsv.bean.CsvBindAndJoinByName;
 import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvCustomBindByName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +24,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "Supplier")
@@ -66,14 +67,14 @@ public class Supplier implements Exportable, Serializable {
     private String website;
 
     @CreationTimestamp
-    @CsvBindByName(column = "created at")
+    @CsvCustomBindByName(column = "created at", converter = com.dahl.webstockmanager.util.LocalDateTimeConverter.class)
     private LocalDateTime createdAt;
     @UpdateTimestamp
-    @CsvBindByName(column = "last ")
+    @CsvCustomBindByName(column = "last update", converter = com.dahl.webstockmanager.util.LocalDateTimeConverter.class)
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @CsvBindAndJoinByName(column = "products", elementType = Product.class)
+    //@CsvCustomBindByName(converter = ProductsConverter.class)
     private List<Product> products;
 
     public Supplier() {

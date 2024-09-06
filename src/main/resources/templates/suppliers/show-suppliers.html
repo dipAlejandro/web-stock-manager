@@ -197,7 +197,7 @@
                 <div class="modal-body">
                     <form id="csvForm" method="post" enctype="multipart/form-data"
                           th:action="@{/docs/import/csv}">
-                        <input type="hidden" name="from" value="supp">
+                        <input type="hidden" name="from" value="suppliers">
                         <div class="mb-3">
                             <button type="button" class="btn btn-warning"
                                     data-bs-toggle="modal" data-bs-target="#csvInfoModal">
@@ -207,11 +207,6 @@
                         <div class="mb-3">
                             <input type="file" class="form-control" id="csvFile" name="csvFile"
                                    accept=".csv" aria-describedby="lbl1">
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="checkBox1" name="withHeaders">
-                            <label class="form-check-label" for="checkBox1">The first
-                                row are headers</label>
                         </div>
                         <div class="mb-3">
                             <button type="submit" class="btn btn-primary">Submit</button>

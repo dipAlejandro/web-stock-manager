@@ -14,22 +14,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class CSVReader {
 
-    public List<Exportable> read(MultipartFile file, Boolean withHeaders, Class<? extends Exportable> clazz) {
+    public List<Exportable> read(MultipartFile file, Class<? extends Exportable> clazz) {
 
         List<Exportable> exportables = new ArrayList<>();
 
         try (Reader reader = new InputStreamReader(file.getInputStream())) {
-            CsvToBean<Exportable> csvToBean = new CsvToBeanBuilder<Exportable>(reader)
+            CsvToBeanBuilder<Exportable> csvToBeanBuilder = new CsvToBeanBuilder<Exportable>(reader)
                     .withType(clazz)
                     .withIgnoreLeadingWhiteSpace(true)
-                    .build();
-            if (withHeaders) {
-                csvToBean.setMappingStrategy(new HeaderColumnNameMappingStrategy<>());
-            }
+                    .withSeparator(',')
+                    .withIgnoreEmptyLine(true);
 
-            for (Exportable e : csvToBean) {
-                exportables.add(e);
-            }
+            CsvToBean<Exportable> csvToBean = null;
+
+            exportables = csvToBean.parse();
         } catch (Exception e) {
             e.printStackTrace();
         }
