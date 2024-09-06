@@ -23,108 +23,108 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class PDFDocGenerator {
-	private static final Logger logger = LoggerFactory.getLogger(PDFDocGenerator.class);
 
-	public <T> void generatePdf(HttpServletResponse response, List<String[]> allRowsContent, String[] headerNames,
-			 String docTitle, String filename) throws IOException {
+    private static final Logger logger = LoggerFactory.getLogger(PDFDocGenerator.class);
 
-		response.setContentType("application/pdf");
+    public <T> void generatePdf(HttpServletResponse response, List<String[]> allRowsContent, String[] headerNames,
+            String docTitle, String filename) throws IOException {
 
-		if (filename == null || filename.isEmpty()) {
-			filename = "document.pdf";
-		} else if (!filename.endsWith(".pdf")) {
-			filename = filename.concat(".pdf");
-		}
+        response.setContentType("application/pdf");
 
-		response.setHeader("Content-Disposition", "attachment; filename=" + filename);
-		if (allRowsContent.isEmpty()) {
-			logger.warn("No content found to include in PDF");
-			createEmptyPDF(response);
-			return;
-		}
+        if (filename == null || filename.isEmpty()) {
+            filename = "document.pdf";
+        } else if (!filename.endsWith(".pdf")) {
+            filename = filename.concat(".pdf");
+        }
 
-		Document document = new Document(PageSize.A4);
-		try {
-			PdfWriter.getInstance(document, response.getOutputStream());
-			document.open();
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+        if (allRowsContent.isEmpty()) {
+            logger.warn("No content found to include in PDF");
+            createEmptyPDF(response);
+            return;
+        }
 
-			// Add the creation date
-			LocalDateTime now = LocalDateTime.now();
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm:ss");
-			String formattedDate = now.format(formatter);
+        Document document = new Document(PageSize.A4);
+        try {
+            PdfWriter.getInstance(document, response.getOutputStream());
+            document.open();
 
-			Font italic = new Font(FontFamily.HELVETICA, 12, Font.ITALIC);
-			Paragraph creationDate = new Paragraph("Creation date: " + formattedDate, italic);
-			creationDate.setSpacingBefore(2f);
-			creationDate.setSpacingAfter(10f);
-			document.add(creationDate);
+            // Add the creation date
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm:ss");
+            String formattedDate = now.format(formatter);
 
-			// Add the title
-			Font titleFont = new Font(FontFamily.HELVETICA, 18, Font.BOLD);
-			Paragraph title = new Paragraph(docTitle, titleFont);
-			title.setAlignment(Element.ALIGN_CENTER);
-			title.setSpacingAfter(20f);
-			document.add(title);
+            Font italic = new Font(FontFamily.HELVETICA, 12, Font.ITALIC);
+            Paragraph creationDate = new Paragraph("Creation date: " + formattedDate, italic);
+            creationDate.setSpacingBefore(2f);
+            creationDate.setSpacingAfter(10f);
+            document.add(creationDate);
 
-			// Add the table
-			com.itextpdf.text.pdf.PdfPTable table = new com.itextpdf.text.pdf.PdfPTable(headerNames.length);
-			table.setWidthPercentage(100);
+            // Add the title
+            Font titleFont = new Font(FontFamily.HELVETICA, 18, Font.BOLD);
+            Paragraph title = new Paragraph(docTitle, titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            title.setSpacingAfter(20f);
+            document.add(title);
 
-			// Add the header
-			addTableHeader(table, headerNames);
+            // Add the table
+            com.itextpdf.text.pdf.PdfPTable table = new com.itextpdf.text.pdf.PdfPTable(headerNames.length);
+            table.setWidthPercentage(100);
 
-			// Add the rows with data
-			for (String[] content : allRowsContent) {
+            // Add the header
+            addTableHeader(table, headerNames);
 
-				addRow(table, content);
-			}
+            // Add the rows with data
+            for (String[] content : allRowsContent) {
 
-			// Add the table to the document
-			document.add(table);
+                addRow(table, content);
+            }
 
-		} catch (DocumentException e) {
-			logger.error("Error while creating PDF", e);
-			throw new IOException(e);
-		} finally {
-			if (document != null) {
-				document.close();
-			}
-		}
-	}
+            // Add the table to the document
+            document.add(table);
 
-	private void createEmptyPDF(HttpServletResponse response) throws IOException {
+        } catch (DocumentException e) {
+            logger.error("Error while creating PDF", e);
+            throw new IOException(e);
+        } finally {
+            if (document != null) {
+                document.close();
+            }
+        }
+    }
 
-		Document emptyDocument = new Document(PageSize.A4);
+    private void createEmptyPDF(HttpServletResponse response) throws IOException {
 
-		try {
-			PdfWriter.getInstance(emptyDocument, response.getOutputStream());
-			emptyDocument.open();
-			Paragraph noData = new Paragraph("No information available");
-			emptyDocument.add(noData);
-		} catch (DocumentException e) {
-			logger.error("Error while creating empty PDF", e);
-			throw new IOException(e);
-		} finally {
-			emptyDocument.close();
-		}
-	}
+        Document emptyDocument = new Document(PageSize.A4);
 
-	private void addTableHeader(com.itextpdf.text.pdf.PdfPTable table, String[] headerNames) {
-		
-	    Font helveticaBold11 = new Font(FontFamily.HELVETICA, 11, Font.BOLD);
-	    var headerCell = new PdfPHeaderCell();
-	    headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        try {
+            PdfWriter.getInstance(emptyDocument, response.getOutputStream());
+            emptyDocument.open();
+            Paragraph noData = new Paragraph("No information available");
+            emptyDocument.add(noData);
+        } catch (DocumentException e) {
+            logger.error("Error while creating empty PDF", e);
+            throw new IOException(e);
+        } finally {
+            emptyDocument.close();
+        }
+    }
 
-	    for (String headerName : headerNames) {
-	        headerCell.setPhrase(new Paragraph(headerName, helveticaBold11));
-	        table.addCell(headerCell);
-	    }
-	}
+    private void addTableHeader(com.itextpdf.text.pdf.PdfPTable table, String[] headerNames) {
 
+        Font helveticaBold11 = new Font(FontFamily.HELVETICA, 11, Font.BOLD);
+        var headerCell = new PdfPHeaderCell();
+        headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-	private void addRow(com.itextpdf.text.pdf.PdfPTable table, String[] info) {
-		for (String string : info) {
-			table.addCell(string);
-		}
-	}
+        for (String headerName : headerNames) {
+            headerCell.setPhrase(new Paragraph(headerName, helveticaBold11));
+            table.addCell(headerCell);
+        }
+    }
+
+    private void addRow(com.itextpdf.text.pdf.PdfPTable table, String[] info) {
+        for (String string : info) {
+            table.addCell(string);
+        }
+    }
 }

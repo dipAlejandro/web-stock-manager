@@ -29,8 +29,8 @@ public class Product implements Exportable {
     @CsvBindByName(column = "id")
     private Integer id;
 
-    @Size(min = 8, max = 14, message = "Code must be between 8 and 14 characters")
-    @Pattern(regexp = "^[0-9]+$", message = "Code must contain only numbers")
+    @Size(min = 8, max = 20, message = "Code must be between 8 and 20 characters")
+    @Pattern(regexp = "^[0-9A-za-z]+$", message = "Code must contain only numbers and characters")
     @CsvBindByName(column = "code")
     private String code;
 

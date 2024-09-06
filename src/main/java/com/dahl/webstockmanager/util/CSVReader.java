@@ -1,33 +1,31 @@
 package com.dahl.webstockmanager.util;
 
-import com.dahl.webstockmanager.entities.Exportable;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
-import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
-import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 @Component
-public class CSVReader {
+public class CSVReader<T> {
 
-    public List<Exportable> read(MultipartFile file, Class<? extends Exportable> clazz) {
-
-        List<Exportable> exportables = new ArrayList<>();
+    // El método ahora recibe la clase del tipo T como argumento
+    public List<T> read(MultipartFile file, Class<T> type) {
+        List<T> exportables = new ArrayList<>();
 
         try (Reader reader = new InputStreamReader(file.getInputStream())) {
-            CsvToBeanBuilder<Exportable> csvToBeanBuilder = new CsvToBeanBuilder<Exportable>(reader)
-                    .withType(clazz)
+            // Usa la clase 'type' para el tipo genérico en CsvToBeanBuilder
+            CsvToBean<T> csvToBean = new CsvToBeanBuilder<T>(reader)
+                    .withType(type)
                     .withIgnoreLeadingWhiteSpace(true)
                     .withSeparator(',')
-                    .withIgnoreEmptyLine(true);
+                    .withIgnoreEmptyLine(true)
+                    .build();  // Es importante llamar a build()
 
-            CsvToBean<Exportable> csvToBean = null;
-
-            exportables = csvToBean.parse();
+            exportables = csvToBean.parse(); // Parseo correcto con el tipo T
         } catch (Exception e) {
             e.printStackTrace();
         }

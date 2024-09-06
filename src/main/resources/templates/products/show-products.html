@@ -236,7 +236,7 @@
                     <div class="modal-body">
                         <form id="excelForm" method="post" enctype="multipart/form-data"
                               th:action="@{/docs/import/excel}">
-                            <input type="hidden" name="from" value="prod">
+                            <input type="hidden" name="from" value="products">
                             <div class="mb-3">
                                 <button type="button" class="btn btn-warning"
                                         data-bs-toggle="modal" data-bs-target="#excelInfoModal">
@@ -245,12 +245,7 @@
                             </div>
                             <div class="mb-3">
                                 <input type="file" class="form-control" id="excelFile"
-                                       name="excelFile" accept=".xls,.xlsx">
-                            </div>
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="checkBox2" name="withHeaders">
-                                <label class="form-check-label" for="checkBox2">The first
-                                    row are headers</label>
+                                       name="xlsxFile" accept=".xls,.xlsx">
                             </div>
                             <div class="mb-3">
                                 <button type="submit" class="btn btn-primary">Submit</button>

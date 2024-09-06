@@ -64,7 +64,7 @@ public class ProductController {
 
         logger.info("[POST] Trying to add new product");
 
-        Integer intSupplierId = Integer.parseInt(supplierId);
+        Integer intSupplierId = Integer.valueOf(supplierId);
 
         try {
             if (bResult.hasErrors()) {
@@ -106,7 +106,7 @@ public class ProductController {
 
         try {
             if (!bResult.hasErrors()) {
-                Integer intSupplierId = Integer.parseInt(supplierId);
+                Integer intSupplierId = Integer.valueOf(supplierId);
                 p.setSupplier(supplierService.getSupplierById(intSupplierId));
                 var updatedProduct = productService.updateProduct(p);
                 logger.info("[POST] The product {} has been updated successfully", p.getId());

@@ -15,12 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dahl.webstockmanager.entities.Exportable;
-import com.dahl.webstockmanager.services.DocReaderService;
+import com.dahl.webstockmanager.services.CsvImportService;
 import com.dahl.webstockmanager.services.DocsGenerationService;
 import com.dahl.webstockmanager.services.ProductService;
 import com.dahl.webstockmanager.services.SupplierService;
+import com.dahl.webstockmanager.services.XlsxImportService;
 
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.logging.Level;
 
 @Controller
 @RequestMapping("/docs")
@@ -30,16 +32,31 @@ public class DocumentController {
     private final DocsGenerationService docService;
     private final ProductService productService;
     private final SupplierService supplierService;
-    private final DocReaderService docReaderService;
+    private final CsvImportService csvImportService;
+    private final XlsxImportService xlsxImportService;
 
+    /**
+     *
+     * @param ps
+     * @param ss
+     * @param dgs
+     * @param csv
+     * @param xlsx
+     */
     @Autowired
-    public DocumentController(ProductService ps, SupplierService ss, DocsGenerationService dgs, DocReaderService drs) {
+    public DocumentController(ProductService ps, SupplierService ss, DocsGenerationService dgs, CsvImportService csv, XlsxImportService xlsx) {
         this.productService = ps;
         this.supplierService = ss;
         this.docService = dgs;
-        this.docReaderService = drs;
+        this.csvImportService = csv;
+        this.xlsxImportService = xlsx;
     }
 
+    /**
+     *
+     * @param httpServletResponse
+     * @param from
+     */
     @GetMapping("/export/pdf")
     public void exportToPdf(HttpServletResponse httpServletResponse, @RequestParam(value = "from") String from) {
 
@@ -88,6 +105,11 @@ public class DocumentController {
         }
     }
 
+    /**
+     *
+     * @param httpServletResponse
+     * @param from
+     */
     @GetMapping("/export/excel")
     public void exportToExcel(HttpServletResponse httpServletResponse, @RequestParam(value = "from") String from) {
 
@@ -128,15 +150,55 @@ public class DocumentController {
         }
     }
 
+    /**
+     *
+     * @param file
+     * @param from
+     * @return
+     */
     @PostMapping("/import/csv")
     public String uploadCsvFile(@RequestParam(value = "csvFile") MultipartFile file, @RequestParam("from") String from) {
 
         System.out.println("New file csv was uploaded");
         System.out.println("From: " + from);
         System.out.println("With size: " + file.getSize());
-
-        docReaderService.readCsvAndPersist(file, from);
+        switch (from) {
+            case "products" ->
+                csvImportService.importProducts(file);
+            case "suppliers" ->
+                csvImportService.importSupplier(file);
+            default ->
+                throw new AssertionError();
+        }
 
         return from.equals("products") ? "redirect:/products" : "redirect:/suppliers/show-all";
+    }
+
+    /**
+     *
+     * @param file
+     * @param from
+     * @return
+     */
+    @PostMapping("/import/excel")
+    public String uploadXlsxFile(@RequestParam(value = "xlsxFile") MultipartFile file, @RequestParam(value = "from") String from) {
+        try {
+            switch (from) {
+                case "products" -> {
+
+                    xlsxImportService.importProducts(file);
+                }
+
+                case "suppliers" ->
+                    xlsxImportService.importSuppliers(file);
+                default ->
+                    throw new AssertionError();
+            }
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(DocumentController.class.getName()).log(Level.SEVERE, null, ex);
+
+        }
+        return from.equals("products") ? "redirect:/products" : "redirect:/suppliers/show-all";
+
     }
 }

@@ -13,8 +13,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataInitializer implements CommandLineRunner {
     
-    private SupplierService supplierService;
+    private final SupplierService supplierService;
     
+    /**
+     *
+     * @param supplierService
+     */
     @Autowired
     public DataInitializer(SupplierService supplierService) {
         this.supplierService = supplierService;
