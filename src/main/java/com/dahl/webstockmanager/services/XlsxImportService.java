@@ -1,6 +1,7 @@
 package com.dahl.webstockmanager.services;
 
 import com.dahl.webstockmanager.entities.Product;
+import com.dahl.webstockmanager.entities.Supplier;
 import java.io.IOException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -56,6 +57,21 @@ public class XlsxImportService {
     }
 
     public void importSuppliers(MultipartFile file) throws IOException {
+        try (Workbook wb = new XSSFWorkbook(file.getInputStream())) {
+            Sheet supplierSheet = wb.getSheet("suppliers");
 
+            for (int i = 1; i <= supplierSheet.getLastRowNum(); i++) {
+                var row = supplierSheet.getRow(i);
+                var supplier = new Supplier();
+
+                supplier.setName(row.getCell(1).getStringCellValue());
+                supplier.setPhoneNumber(row.getCell(2).getStringCellValue().replace("\"", ""));
+                supplier.setEmail(row.getCell(3).getStringCellValue());
+                supplier.setAddress(row.getCell(4).getStringCellValue());
+                supplier.setWebsite((row.getCell(5).getStringCellValue() == null) ? "N/A" : row.getCell(5).getStringCellValue().replace("\"", ""));
+
+                supplierService.addSupplier(supplier);
+            }
+        }
     }
 }
