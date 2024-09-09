@@ -1,11 +1,14 @@
 package com.dahl.webstockmanager.repository;
 
-import org.springframework.data.repository.CrudRepository;
 
 import com.dahl.webstockmanager.entities.Supplier;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+/**
+ *
+ * @author dahl
+ */
 @Repository
-public interface ISupplierRepository extends CrudRepository<Supplier, Integer>{
+public interface ISupplierRepository extends JpaRepository<Supplier, Integer>{
 }

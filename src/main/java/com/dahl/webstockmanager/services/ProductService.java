@@ -9,12 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.dahl.webstockmanager.entities.Product;
 import com.dahl.webstockmanager.repository.IProductRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
 public class ProductService {
 
-    private IProductRepository repository;
+    private final IProductRepository repository;
 
+    @Autowired
     public ProductService(IProductRepository repo) {
         this.repository = repo;
     }
@@ -44,7 +46,7 @@ public class ProductService {
 
     @Transactional
     public Product updateProduct(Product p) throws EntityNotFoundException {
-        if (p == null || !repository.existsById(p.getId())) {
+        if (!repository.existsById(p.getId()) || p == null) {
             throw new EntityNotFoundException("Product with ID " + p.getId() + " not found or Product is null");
         }
         return repository.save(p);
@@ -52,10 +54,12 @@ public class ProductService {
 
     @Transactional
     public void deleteProduct(Integer id) throws EntityNotFoundException {
-        if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Product with ID " + id + " not found");
-        }
+        repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product with ID " + id + " not found"));
+        //repository.deleteById(id);
+        repository.deleteByIdCustom(id);
+    }
 
-        repository.delete(getProductById(id));
+    public boolean existsById(Integer intId) {
+        return repository.existsById(intId);
     }
 }

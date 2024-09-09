@@ -1,15 +1,12 @@
 package com.dahl.webstockmanager.entities;
 
-import com.opencsv.bean.CsvBindAndJoinByName;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvCustomBindByName;
+import jakarta.persistence.Column;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,11 +14,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Entity
+@Table(name = "product")
 public class Product implements Exportable {
 
     @Id
@@ -39,10 +38,6 @@ public class Product implements Exportable {
     @CsvBindByName(column = "name")
     private String name;
 
-    @Size(min = 3, max = 15, message = "Description must be between 3 and 15 characters")
-    @Pattern(regexp = "^[A-Za-z0-9 ]*$", message = "Description must contain only upper and lower case characters and numbers")
-    @CsvBindByName(column = "description")
-    private String description;
     @CsvBindByName(column = "section")
     private String section;
 
@@ -50,24 +45,30 @@ public class Product implements Exportable {
     @CsvBindByName(column = "price")
     private double price;
 
-    @CreationTimestamp
+    @Size(min = 3, max = 15, message = "Description must be between 3 and 15 characters")
+    @Pattern(regexp = "^[A-Za-z0-9 ]*$", message = "Description must contain only upper and lower case characters and numbers")
+    @CsvBindByName(column = "description")
+    private String description;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
     @CsvCustomBindByName(column = "created at", converter = com.dahl.webstockmanager.util.LocalDateTimeConverter.class)
     private LocalDateTime createdAt;
-    @UpdateTimestamp
+
+    @Column(name = "updated_at", nullable = false)
     @CsvCustomBindByName(column = "last update", converter = com.dahl.webstockmanager.util.LocalDateTimeConverter.class)
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;    
+
     @CsvBindByName(column = "supplier id")
     // Usado para relacionar el proveedor al importar desde .csv
     private Integer tempSupplierId;
 
     @ManyToOne
-    @JoinColumn(name = "supplier_id")
-    //@CsvBindAndJoinByName(column = "supplier", elementType = Supplier.class)
+    @JoinColumn(name = "fk_supplier", nullable = false)
     private Supplier supplier;
 
     public Product() {
     }
-    
+
     public Integer getId() {
         return id;
     }
@@ -151,8 +152,8 @@ public class Product implements Exportable {
     @Override
     public String toString() {
         return "Product [id=" + id + ", code=" + code + ", name=" + name + ", description=" + description + ", section="
-                + section + ", price=" + price + ", createAt=" + createdAt + ", updateAt=" + updatedAt + ", supplier="
-                + supplier.getName() + "]";
+                + section + ", price=" + price + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", supplier="
+                + (supplier != null ? supplier.getName() : "No supplier") + "]";
     }
 
     @Override
@@ -165,9 +166,9 @@ public class Product implements Exportable {
             this.description,
             this.section,
             "$ " + this.price,
-            this.supplier.getName(),
-            this.createdAt.format(formatter),
-            this.updatedAt.format(formatter)
+            this.supplier != null ? this.supplier.getName() : "No supplier",
+            this.createdAt != null ? this.createdAt.format(formatter) : "N/A",
+            this.updatedAt != null ? this.updatedAt.format(formatter) : "N/A"
         };
     }
 
@@ -182,11 +183,10 @@ public class Product implements Exportable {
         map.put("Description", description);
         map.put("Section", section);
         map.put("Price", price);
-        map.put("Supplier", supplier.getName());
-        map.put("Created At", createdAt.format(formatter));
-        map.put("Last Update", updatedAt.format(formatter));
+        map.put("Supplier", supplier != null ? supplier.getName() : "No supplier");
+        map.put("Created At", createdAt != null ? createdAt.format(formatter) : "N/A");
+        map.put("Last Update", updatedAt != null ? updatedAt.format(formatter) : "N/A");
 
         return map;
     }
-
 }

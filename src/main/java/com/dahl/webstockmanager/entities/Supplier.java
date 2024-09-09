@@ -21,13 +21,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.format.DateTimeFormatter;
 
 @Entity
-@Table(name = "Supplier")
+@Table(name = "supplier")
 public class Supplier implements Exportable, Serializable {
 
     /**
@@ -65,11 +67,14 @@ public class Supplier implements Exportable, Serializable {
     @Column(name = "website")
     @CsvBindByName(column = "website")
     private String website;
-
-    @CreationTimestamp
+    
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     @CsvCustomBindByName(column = "created at", converter = com.dahl.webstockmanager.util.LocalDateTimeConverter.class)
     private LocalDateTime createdAt;
-    @UpdateTimestamp
+    
+    @Column(name = "updated_at", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     @CsvCustomBindByName(column = "last update", converter = com.dahl.webstockmanager.util.LocalDateTimeConverter.class)
     private LocalDateTime updatedAt;
 

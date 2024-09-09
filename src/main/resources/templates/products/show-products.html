@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,7 +30,7 @@
                         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                             <ul class="navbar-nav">
                                 <li class="nav-item"><a class="nav-link active"
-                                                        aria-current="page" th:href="@{/}">List All Products <i
+                                                        aria-current="page" th:href="@{/products/all}">List All Products <i
                                             class="bi bi-list-ol"></i></a></li>
                                 <li class="nav-item"><a class="nav-link"
                                                         th:href="@{/products/new}">Add New Product <i
@@ -134,16 +134,16 @@
                                 th:text="${#temporals.format(product.updatedAt, 'dd/MM/yyyy - HH:mm:ss')}"></td>
 
                             <!-- Actions -->
-                            <td><a th:href="@{/products/{id}(id=${product.id})}"
+                            <td><a th:href="@{/products/details/{id}(id=${product.id})}"
                                    class="btn btn-sm btn-primary" title="See all information">See
                                     Detail <i class="bi bi-eye"></i>
                                 </a> <a th:href="@{/products/update/{id}(id=${product.id})}"
                                         class="btn btn-sm btn-success">Edit <i class="bi bi-pencil"></i></a>
-                                <button class="btn btn-sm btn-danger"
-                                        th:attr="data-product-id=${product.id}, data-product-name=${product.name}"
-                                        data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                    Delete <i class="bi bi-trash"></i>
-                                </button></td>
+                                <form th:action="@{/products/delete}" th:method="post">
+                                    <input type="hidden" name="id" th:value="${product.id}">
+                                    <input type="submit" name="delete" value="Eliminar">
+                                </form>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -152,35 +152,6 @@
                 <p>&copy; 2024 Mi empresa</p>
             </footer>
         </div>
-
-        <!-- Modal for 'delete' button -->
-        <div class="modal fade" id="deleteModal" data-bs-backdrop="static"
-             data-bs-keyboard="false" tabindex="-1"
-             aria-labelledby="deleteModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="deleteModalLabel">Confirm
-                            Deletion</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to delete "<span id="productNameToDelete"></span>"?
-                        <span class="text-danger">This action cannot be reversed.</span>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary"
-                                data-bs-dismiss="modal">Cancel</button>
-                        <form id="deleteForm" method="post"
-                              th:action="@{/products/delete/__}" style="display: inline;">
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Modal for csv upload Form -->
         <div class="modal fade" id="csvUploadFormModal"
              data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -397,29 +368,11 @@
                 </div>
             </div>
         </div>
-
-
-
         <script
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         crossorigin="anonymous"></script>
 
         <script type="text/javascript" th:src="@{/resources/js/scripts.js}"></script>
 
-        <script th:inline="javascript">
-            document.addEventListener('DOMContentLoaded', function () {
-                var baseUrl = /*[[ @{/products/delete/} ]]*/;
-
-                var deleteModal = document.getElementById('deleteModal');
-                deleteModal.addEventListener('show.bs.modal', function (event) {
-                    var button = event.relatedTarget;
-                    var productId = button.getAttribute('data-product-id');
-                    var productName = button.getAttribute('data-product-name');
-                    var deleteForm = document.getElementById('deleteForm');
-                    deleteForm.action = baseUrl + productId;
-                    document.getElementById('productNameToDelete').textContent = productName;
-                });
-            });
-        </script>
     </body>
 </html>
