@@ -14,7 +14,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -45,7 +48,7 @@ public class Product implements Exportable {
     @CsvBindByName(column = "price")
     private double price;
 
-    @Size(min = 3, max = 15, message = "Description must be between 3 and 15 characters")
+    @Size(max = 50, message = "Description must not be grater than 50 characters")
     @Pattern(regexp = "^[A-Za-z0-9 ]*$", message = "Description must contain only upper and lower case characters and numbers")
     @CsvBindByName(column = "description")
     private String description;
@@ -56,10 +59,11 @@ public class Product implements Exportable {
 
     @Column(name = "updated_at", nullable = false)
     @CsvCustomBindByName(column = "last update", converter = com.dahl.webstockmanager.util.LocalDateTimeConverter.class)
-    private LocalDateTime updatedAt;    
+    private LocalDateTime updatedAt;
 
     @CsvBindByName(column = "supplier id")
-    // Usado para relacionar el proveedor al importar desde .csv
+    @Transient
+    // Usado solo para relacionar el proveedor al importar desde .csv
     private Integer tempSupplierId;
 
     @ManyToOne
@@ -147,6 +151,17 @@ public class Product implements Exportable {
 
     public void setTempSupplierId(Integer tempSupplierId) {
         this.tempSupplierId = tempSupplierId;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
     @Override

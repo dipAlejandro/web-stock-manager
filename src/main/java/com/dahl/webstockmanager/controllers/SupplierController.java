@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.dahl.webstockmanager.entities.Supplier;
@@ -30,7 +31,7 @@ public class SupplierController {
 
     private static final Logger logger = LoggerFactory.getLogger(SupplierController.class);
 
-    @GetMapping("/show-all")
+    @GetMapping("/all")
     public String showSuppliers(Model model) {
         logger.info("[GET] Showing Suppliers");
         List<Supplier> suppliers = supService.getAllSuppliers();
@@ -79,7 +80,7 @@ public class SupplierController {
         return "redirect:/suppliers/new";
     }
 
-    @GetMapping("/show/{id}")
+    @GetMapping("/details/{id}")
     public String showSupplierDetail(@PathVariable(value = "id") Integer id, Model model) {
         logger.info("[GET] Supplier {} detail", id);
         model.addAttribute("supplier", supService.getSupplierById(id));
@@ -127,8 +128,8 @@ public class SupplierController {
 
     }
 
-    @PostMapping("/delete/{id}")
-    public String deleteSupplier(@PathVariable(value = "id") Integer id) {
+    @PostMapping("/delete")
+    public String deleteSupplier(@RequestParam Integer id) {
         logger.info("[DELETE] Trying to delete supplier with ID: {}", id);
 
         try {
@@ -141,6 +142,6 @@ public class SupplierController {
             logger.warn("[DELETE] An error has occurred while trying to delete the supplier with ID: {} ", id);
             e.printStackTrace();
         }
-        return "redirect:/suppliers/show-all";
+        return "redirect:/suppliers/all";
     }
 }

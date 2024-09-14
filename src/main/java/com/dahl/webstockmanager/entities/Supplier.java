@@ -9,9 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,9 +17,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -67,19 +64,16 @@ public class Supplier implements Exportable, Serializable {
     @Column(name = "website")
     @CsvBindByName(column = "website")
     private String website;
-    
-    @Column(name = "created_at", nullable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
+
+    @Column(name = "created_at", nullable = false)
     @CsvCustomBindByName(column = "created at", converter = com.dahl.webstockmanager.util.LocalDateTimeConverter.class)
     private LocalDateTime createdAt;
-    
-    @Column(name = "updated_at", nullable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
+
+    @Column(name = "updated_at", nullable = false)
     @CsvCustomBindByName(column = "last update", converter = com.dahl.webstockmanager.util.LocalDateTimeConverter.class)
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    //@CsvCustomBindByName(converter = ProductsConverter.class)
     private List<Product> products;
 
     public Supplier() {
@@ -155,6 +149,17 @@ public class Supplier implements Exportable, Serializable {
 
     public void setProducts(List<Product> products) {
         this.products = products;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
     @Override
