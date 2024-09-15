@@ -1,11 +1,14 @@
 package com.dahl.webstockmanager.controllers;
 
-import com.dahl.webstockmanager.entities.Product;
-import com.dahl.webstockmanager.entities.ProductCategory;
+import com.dahl.webstockmanager.dto.ProductDTO;
+import com.dahl.webstockmanager.mapper.ProductMapper;
+import com.dahl.webstockmanager.services.CategoryService;
 import com.dahl.webstockmanager.services.ProductService;
 import com.dahl.webstockmanager.services.SupplierService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,25 +29,32 @@ public class ProductController {
 
     private final ProductService productService;
     private final SupplierService supplierService;
+    private final CategoryService categoryService;
+    private final ProductMapper productMapper;
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     @Autowired
-    public ProductController(ProductService ps, SupplierService ss) {
+    public ProductController(ProductService ps, SupplierService ss, CategoryService cs, com.dahl.webstockmanager.mapper.ProductMapper productMapper) {
         this.productService = ps;
         this.supplierService = ss;
+        this.categoryService = cs;
+        this.productMapper = productMapper;
     }
 
     @GetMapping("/all")
     public String showProducts(Model model) {
         logger.info("[GET] Showing products");
-        model.addAttribute("products", productService.getAllProducts());
+        List<ProductDTO> products = productService.getAllProducts().stream()
+                .map(productMapper::toDTO)
+                .collect(Collectors.toList());
+        model.addAttribute("products", products);
         return "products/show-products";
     }
 
     @GetMapping("details/{id}")
     public String showProductDetail(@PathVariable Integer id, Model model) {
         logger.info("[GET] Product {} detail", id);
-        model.addAttribute("product", productService.getProductById(id));
+        model.addAttribute("product", productMapper.toDTO(productService.getProductById(id)));
         return "products/product-detail";
     }
 
@@ -52,17 +62,17 @@ public class ProductController {
     public String newProductForm(Model model) {
         logger.info("[GET] Showing new product form");
         populateProductModel(model);
-        model.addAttribute("newProduct", new Product());
+        model.addAttribute("newProduct", new ProductDTO());
         return "products/new-product-form";
     }
 
     @PostMapping("/new")
-    public String createProduct(@Valid @ModelAttribute("newProduct") Product newProduct,
-            @RequestParam("supplierId") String supplierId,
+    public String createProduct(@Valid @ModelAttribute("newProduct") ProductDTO productDtoFromView,
             BindingResult bResult, RedirectAttributes redirectAttributes, Model model) {
 
         logger.info("[POST] Trying to add new product");
 
+        // Verificar errores
         if (bResult.hasErrors()) {
             logger.warn("[POST] Validation errors while adding new product");
             populateProductModel(model);
@@ -70,17 +80,25 @@ public class ProductController {
         }
 
         try {
-            Integer intSupplierId = Integer.parseInt(supplierId);
-            newProduct.setSupplier(supplierService.getSupplierById(intSupplierId));
-            productService.addProduct(newProduct);
+
+            var newProductToPersist = productMapper.toEntity(productDtoFromView);
+
+            productService.addProduct(newProductToPersist);
             redirectAttributes.addFlashAttribute("message", "Product added successfully!");
             redirectAttributes.addFlashAttribute("alertClass", "alert-success");
-            logger.info("[POST] New product added {}", newProduct);
+            logger.info("[POST] New product added {}", newProductToPersist);
+
             return "redirect:/products/new";
+
         } catch (NumberFormatException | EntityNotFoundException e) {
             redirectAttributes.addFlashAttribute("message", "Error adding product.");
             redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
             logger.warn("[POST] Error adding new product", e);
+            return "products/new-product-form";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("message", "Unexpected error occurred.");
+            redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
+            logger.error("[POST] Unexpected error while adding new product", e);
             return "products/new-product-form";
         }
     }
@@ -89,31 +107,39 @@ public class ProductController {
     public String updateProductForm(@PathVariable Integer id, Model model) {
         logger.info("[GET] Showing update form for product {}", id);
         populateProductModel(model);
-        model.addAttribute("product", productService.getProductById(id));
+        model.addAttribute("product", productMapper.toDTO(productService.getProductById(id)));
         return "products/update-product-form";
     }
 
     @PostMapping("/saveupdate")
-    public String saveUpdate(@Valid @ModelAttribute("product") Product p,
+    public String saveUpdate(@Valid @ModelAttribute("product") ProductDTO productDto,
             @RequestParam("supplierId") String supplierId,
             BindingResult bResult, Model model) {
-        logger.info("[POST] Trying to update product {}", p.getId());
+
+        logger.info("[POST] Trying to update product {}", productDto.getId());
 
         if (bResult.hasErrors()) {
-            logger.warn("[POST] Validation errors while updating product {}", p.getId());
+            logger.warn("[POST] Validation errors while updating product {}", productDto.getId());
             populateProductModel(model);
             return "products/update-product-form";
         }
 
         try {
-            Integer intSupplierId = Integer.parseInt(supplierId);
-            p.setSupplier(supplierService.getSupplierById(intSupplierId));
-            var updatedProduct = productService.updateProduct(p);
-            logger.info("[POST] Product {} updated successfully", p.getId());
-            model.addAttribute("productUpdated", updatedProduct);
+            var product = productMapper.toEntity(productDto);
+            Integer intSupplierId = Integer.valueOf(supplierId);
+            product.setSupplier(supplierService.getSupplierById(intSupplierId));
+
+            productService.updateProduct(product);
+            logger.info("[POST] Product {} updated successfully", product.getId());
+            var productDtoUpdated = productMapper.toDTO(product);
+            model.addAttribute("productUpdated", productDtoUpdated);
             return "products/save-update";
         } catch (NumberFormatException | EntityNotFoundException e) {
-            logger.warn("[POST] Error updating product {}", p.getId(), e);
+            logger.warn("[POST] Error updating product {}", productDto.getId(), e);
+            populateProductModel(model);
+            return "products/update-product-form";
+        } catch (Exception e) {
+            logger.error("[POST] Unexpected error while updating product {}", productDto.getId(), e);
             populateProductModel(model);
             return "products/update-product-form";
         }
@@ -125,7 +151,6 @@ public class ProductController {
             Integer intId = Integer.valueOf(id);
             logger.info("[DELETE] Trying to delete product with ID: {}", intId);
 
-            // Verificar si el producto existe antes de intentar eliminarlo
             if (!productService.existsById(intId)) {
                 logger.warn("[DELETE] Product with ID: {} does not exist", intId);
                 return "redirect:/products/all";
@@ -144,7 +169,7 @@ public class ProductController {
     }
 
     private void populateProductModel(Model model) {
-        model.addAttribute("sections", ProductCategory.values());
+        model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("suppliers", supplierService.getAllSuppliers());
     }
 }

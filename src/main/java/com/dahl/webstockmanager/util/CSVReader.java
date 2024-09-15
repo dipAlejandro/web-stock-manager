@@ -23,7 +23,7 @@ public class CSVReader<T> {
                     .withIgnoreLeadingWhiteSpace(true)
                     .withSeparator(',')
                     .withIgnoreEmptyLine(true)
-                    .build();  // Es importante llamar a build()
+                    .build();
 
             exportables = csvToBean.parse(); // Parseo correcto con el tipo T
         } catch (Exception e) {

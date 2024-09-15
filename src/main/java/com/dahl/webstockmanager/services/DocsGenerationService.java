@@ -18,9 +18,9 @@ public class DocsGenerationService {
 
 	private static final Logger logger = LoggerFactory.getLogger(DocsGenerationService.class);
 
-	private PDFDocGenerator pdfGen;
+	private final PDFDocGenerator pdfGen;
 
-	private ExcelDocGenerator excelGen;
+	private final ExcelDocGenerator excelGen;
 
 	@Autowired
 	public DocsGenerationService(PDFDocGenerator pdf, ExcelDocGenerator excel) {

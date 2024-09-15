@@ -104,16 +104,16 @@
           </div>
 
           <div class="mb-3">
-            <label for="sectionInput" class="form-label">Section</label>
+            <label for="sectionInput" class="form-label">Category</label>
             <select
               id="sectionInput"
-              th:field="*{section}"
+              th:field="*{categoryName}"
               class="form-control"
             >
               <option
-                th:each="section : ${sections}"
-                th:value="${section}"
-                th:text="${section}"
+                th:each="category : ${categories}"
+                th:value="${category.name}"
+                th:text="${category.name}"
               ></option>
             </select>
           </div>

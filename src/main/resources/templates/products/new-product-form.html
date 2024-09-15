@@ -109,16 +109,16 @@
           </div>
 
           <div class="mb-3">
-            <label for="sectionInput" class="form-label">Section</label>
+            <label for="categoryNameInput" class="form-label">Category</label>
             <select
-              th:id="sectionInput"
-              th:field="*{section}"
+              th:id="categoryNameInput"
+              th:field="*{categoryName}"
               class="form-select"
             >
               <option
-                th:each="section : ${sections}"
-                th:value="${section}"
-                th:text="${section}"
+                th:each="category : ${categories}"
+                th:value="${category.name}"
+                th:text="${category.name}"
               ></option>
             </select>
           </div>
@@ -161,11 +161,12 @@
               name="supplierId"
               class="form-select"
               required="required"
+              th:field="*{supplierName}"
             >
               <option selected="selected" value="">Select a Suppliers</option>
               <option
                 th:each="sup : ${suppliers}"
-                th:value="${sup.id}"
+                th:value="${sup.name}"
                 th:text="${sup.name}"
               ></option>
             </select>

@@ -45,6 +45,10 @@ public class SupplierService {
                 .orElseThrow(() -> new EntityNotFoundException("Supplier with ID " + id + " not found"));
     }
 
+    public Supplier getSupplierByName(String name) throws EntityNotFoundException {
+        return repository.getSupplierByName(name).orElseThrow(() -> new EntityNotFoundException("Supplier with name " + name + " not found"));
+    }
+
     @Transactional
     public Supplier updateSupplier(Supplier s) throws EntityNotFoundException {
         if (s == null || !repository.existsById(s.getId())) {

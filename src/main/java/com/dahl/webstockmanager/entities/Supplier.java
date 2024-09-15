@@ -37,6 +37,7 @@ public class Supplier implements Exportable, Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @CsvBindByName(column = "id")
+    @Column(name = "supplier_id")
     private Integer id;
 
     @Size(min = 3, max = 20, message = "Name must be between 3 and 20 characters")

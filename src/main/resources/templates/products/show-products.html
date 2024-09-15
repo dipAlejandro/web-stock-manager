@@ -159,7 +159,7 @@
             <tr>
               <th scope="col">Code</th>
               <th scope="col">Name</th>
-              <th scope="col">Section</th>
+              <th scope="col">Section / Category</th>
               <th scope="col">Price</th>
               <th scope="col">Supplier</th>
               <th scope="col">Updated At</th>
@@ -177,9 +177,9 @@
               <!-- Info -->
               <td th:text="${product.code}"></td>
               <td th:text="${product.name}"></td>
-              <td th:text="${product.section}"></td>
+              <td th:text="${product.categoryName}"></td>
               <td th:text="'$'+ ${product.price}"></td>
-              <td th:text="${product.supplier.name}"></td>
+              <td th:text="${product.supplierName}"></td>
               <td
                 th:text="${#temporals.format(product.updatedAt, 'dd/MM/yyyy - HH:mm:ss')}"
               ></td>

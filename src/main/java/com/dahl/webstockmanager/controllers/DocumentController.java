@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dahl.webstockmanager.entities.Exportable;
+import com.dahl.webstockmanager.mapper.ProductMapper;
 import com.dahl.webstockmanager.services.CsvImportService;
 import com.dahl.webstockmanager.services.DocsGenerationService;
 import com.dahl.webstockmanager.services.ProductService;
@@ -34,6 +35,7 @@ public class DocumentController {
     private final SupplierService supplierService;
     private final CsvImportService csvImportService;
     private final XlsxImportService xlsxImportService;
+    private final ProductMapper productMapper;
 
     /**
      *
@@ -44,12 +46,13 @@ public class DocumentController {
      * @param xlsx
      */
     @Autowired
-    public DocumentController(ProductService ps, SupplierService ss, DocsGenerationService dgs, CsvImportService csv, XlsxImportService xlsx) {
+    public DocumentController(ProductService ps, SupplierService ss, DocsGenerationService dgs, CsvImportService csv, XlsxImportService xlsx, ProductMapper productMapper) {
         this.productService = ps;
         this.supplierService = ss;
         this.docService = dgs;
         this.csvImportService = csv;
         this.xlsxImportService = xlsx;
+        this.productMapper = productMapper;
     }
 
     /**
@@ -63,9 +66,10 @@ public class DocumentController {
         List<? extends Exportable> records;
 
         switch (from.toLowerCase()) {
-            case "products" ->
-                records = productService.getAllProducts();
+            case "products" -> {
 
+                records = productMapper.allToDTO(productService.getAllProducts());
+            }
             case "suppliers" ->
                 records = supplierService.getAllSuppliers();
 
@@ -86,7 +90,7 @@ public class DocumentController {
 
             if (from.equals("products")) {
 
-                headers = new String[]{"ID", "Code", "Name", "Section", "Price", "Supplier", "Description",
+                headers = new String[]{"ID", "Code", "Name", "Category", "Price", "Supplier", "Description",
                     "Created At", "Last Update"};
                 filename = "products.pdf";
                 title = "Products List";
@@ -117,7 +121,7 @@ public class DocumentController {
 
         switch (from.toLowerCase()) {
             case "products" ->
-                records = productService.getAllProducts();
+                records = productMapper.allToDTO(productService.getAllProducts());
 
             case "suppliers" ->
                 records = supplierService.getAllSuppliers();
@@ -134,7 +138,7 @@ public class DocumentController {
             String filename;
 
             if (from.equals("products")) {
-                headers = new String[]{"ID", "Code", "Name", "Section", "Price", "Supplier", "Description",
+                headers = new String[]{"ID", "Code", "Name", "Category", "Price", "Supplier", "Description",
                     "Created At", "Last Update"};
                 filename = "products.xlsx";
             } else {
@@ -201,4 +205,5 @@ public class DocumentController {
         return from.equals("products") ? "redirect:/products" : "redirect:/suppliers/show-all";
 
     }
+
 }

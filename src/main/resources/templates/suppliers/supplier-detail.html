@@ -116,7 +116,7 @@
               <th scope="col">ID</th>
               <th scope="col">Code</th>
               <th scope="col">Name</th>
-              <th scope="col">Section</th>
+              <th scope="col">Section / Category</th>
               <th scope="col">Price</th>
               <th scope="col">Description</th>
             </tr>
@@ -131,7 +131,7 @@
               <td th:text="${product.id}"></td>
               <td th:text="${product.code}"></td>
               <td th:text="${product.name}"></td>
-              <td th:text="${product.section}"></td>
+              <td th:text="${product.category.name}"></td>
               <td th:text="'$'+ ${product.price}"></td>
               <td th:text="${product.description}"></td>
             </tr>

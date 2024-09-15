@@ -1,5 +1,6 @@
 package com.dahl.webstockmanager.services;
 
+import com.dahl.webstockmanager.dto.ProductDTO;
 import com.dahl.webstockmanager.entities.Product;
 import com.dahl.webstockmanager.entities.Supplier;
 import java.io.IOException;
@@ -19,11 +20,13 @@ public class XlsxImportService {
 
     private final ProductService productService;
     private final SupplierService supplierService;
+    private final CategoryService categoryService;
 
     @Autowired
-    public XlsxImportService(ProductService productService, SupplierService supplierService) {
+    public XlsxImportService(ProductService productService, SupplierService supplierService, com.dahl.webstockmanager.services.CategoryService categoryService) {
         this.productService = productService;
         this.supplierService = supplierService;
+        this.categoryService = categoryService;
     }
 
     /**
@@ -37,19 +40,18 @@ public class XlsxImportService {
 
             for (int i = 1; i <= productSheet.getLastRowNum(); i++) {
                 var row = productSheet.getRow(i);
-                var product = new Product();
-
+                var dto = new ProductDTO();
                 //System.out.println("code: "+String.valueOf(row.getCell(1).getNumericCellValue()));
-                product.setCode(row.getCell(1).getStringCellValue().replace("\"", ""));
+                dto.setCode(row.getCell(1).getStringCellValue().replace("\"", ""));
 
-                product.setName(row.getCell(2).getStringCellValue());
-                product.setSection(row.getCell(3).getStringCellValue());
-                product.setPrice(row.getCell(4).getNumericCellValue());
-                product.setDescription(row.getCell(5).getStringCellValue());
+                dto.setName(row.getCell(2).getStringCellValue());
+                dto.setCategoryName(row.getCell(3).getStringCellValue());
+                dto.setPrice(row.getCell(4).getNumericCellValue());
+                dto.setDescription(row.getCell(5).getStringCellValue());
+                dto.setSupplierName(row.getCell(6).getStringCellValue());
+                productDataTransfer(dto);
 
-                int supplierId = (int) row.getCell(6).getNumericCellValue();
-                product.setSupplier(supplierService.getSupplierById(supplierId));
-
+                var product = productDataTransfer(dto);
                 productService.addProduct(product);
             }
         }
@@ -73,5 +75,24 @@ public class XlsxImportService {
                 supplierService.addSupplier(supplier);
             }
         }
+    }
+
+    private Product productDataTransfer(ProductDTO dto) {
+        var product = new Product();
+        var category = categoryService.getCategoryByName(dto.getCategoryName());
+        var supplier = supplierService.getSupplierByName(dto.getSupplierName());
+        product.setCode(dto.getCode());
+        product.setName(dto.getName());
+        product.setCategory(category);
+        product.setPrice(dto.getPrice());
+        product.setDescription(dto.getDescription());
+        product.setSupplier(supplier);
+        product.setCreatedAt(dto.getCreatedAt());
+        product.setUpdatedAt(dto.getUpdatedAt());
+        return product;
+    }
+
+    private Supplier supplierDataTransfer() {
+        return null;
     }
 }
