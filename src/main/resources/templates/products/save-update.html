@@ -54,39 +54,39 @@
         </nav>
       </header>
       <section class="bg-grad-3 p-5 rounded mb-4">
-        <h2 class="text-center text-white">Product Updated</h2>
+        <h2 class="text-center text-white">Product Updated Successfully</h2>
       </section>
       <section class="my-4 w-50 mx-auto">
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
-            <strong>ID: </strong> <span th:text="${product.id}"></span>
+            <strong>ID: </strong> <span th:text="${productUpdated.id}"></span>
           </li>
           <li class="list-group-item">
-            <strong>Code: </strong><span th:text="${product.code}"></span>
+            <strong>Code: </strong><span th:text="${productUpdated.code}"></span>
           </li>
           <li class="list-group-item">
-            <strong>Name: </strong><span th:text="${product.name}"></span>
+            <strong>Name: </strong><span th:text="${productUpdated.name}"></span>
           </li>
           <li class="list-group-item">
             <strong>Section / Category: </strong
-            ><span th:text="${product.categoryName}"></span>
+            ><span th:text="${productUpdated.categoryName}"></span>
           </li>
           <li class="list-group-item">
             <strong>Price: </strong
-            ><span th:text="'$' + ${product.price}"></span>
+            ><span th:text="'$' + ${productUpdated.price}"></span>
           </li>
           <li class="list-group-item">
             <strong>Description: </strong>
-            <span th:text="${product.description}"></span>
+            <span th:text="${productUpdated.description}"></span>
           </li>
           <li class="list-group-item">
             <strong>Supplier: </strong>
-            <span th:text="${product.supplierName}"></span>
+            <span th:text="${productUpdated.supplierName}"></span>
           </li>
           <li class="list-group-item">
             <strong>Updated At: </strong>
             <span
-              th:text="${#temporals.format(product.updatedAt, 'dd/MM/yyyy - HH:mm:ss')}"
+              th:text="${#temporals.format(productUpdated.updatedAt, 'dd/MM/yyyy - HH:mm:ss')}"
             ></span>
           </li>
         </ul>

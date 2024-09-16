@@ -44,7 +44,7 @@ public class CategoryService {
         return repo.save(pc);
     }
 
-    public void deleteCategory(Integer id) {
+    public void deleteCategoryById(Integer id) {
         repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Category with ID " + id + " not found"));
         repo.deleteById(id);
     }

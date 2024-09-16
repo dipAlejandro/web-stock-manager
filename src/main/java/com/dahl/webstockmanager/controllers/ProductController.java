@@ -1,6 +1,7 @@
 package com.dahl.webstockmanager.controllers;
 
 import com.dahl.webstockmanager.dto.ProductDTO;
+import com.dahl.webstockmanager.entities.ProductCategory;
 import com.dahl.webstockmanager.mapper.ProductMapper;
 import com.dahl.webstockmanager.services.CategoryService;
 import com.dahl.webstockmanager.services.ProductService;
@@ -12,6 +13,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -47,7 +50,9 @@ public class ProductController {
         List<ProductDTO> products = productService.getAllProducts().stream()
                 .map(productMapper::toDTO)
                 .collect(Collectors.toList());
+
         model.addAttribute("products", products);
+        model.addAttribute("categories", categoryService.getAllCategories());
         return "products/show-products";
     }
 
@@ -125,15 +130,24 @@ public class ProductController {
         }
 
         try {
+            // Crear producto a partir del DTO obtenido del formulario
             var product = productMapper.toEntity(productDto);
+            
             Integer intSupplierId = Integer.valueOf(supplierId);
+            
             product.setSupplier(supplierService.getSupplierById(intSupplierId));
 
             productService.updateProduct(product);
+            
             logger.info("[POST] Product {} updated successfully", product.getId());
-            var productDtoUpdated = productMapper.toDTO(product);
-            model.addAttribute("productUpdated", productDtoUpdated);
+            
+            // Crear DTO para enviar a la vista a partir de
+           // var productDtoUpdated = productMapper.toDTO(product);
+            
+            model.addAttribute("productUpdated", productDto);
+            
             return "products/save-update";
+            
         } catch (NumberFormatException | EntityNotFoundException e) {
             logger.warn("[POST] Error updating product {}", productDto.getId(), e);
             populateProductModel(model);
@@ -165,6 +179,22 @@ public class ProductController {
         } catch (Exception e) {
             logger.error("[DELETE] Unexpected error while deleting product with ID: {}", id, e);
         }
+        return "redirect:/products/all";
+    }
+    
+    @PostMapping("/cat/add")
+     public String addCategory(@RequestParam String name){
+         if (name!=null) {
+            categoryService.addCategory(new ProductCategory(name));
+        }
+         return "redirect:/products/all";
+     }
+    @PostMapping("/cat/delete")
+    public String deleteCategory(@RequestParam Integer catId) {
+        if (catId != null) {
+            categoryService.deleteCategoryById(catId);
+        }
+
         return "redirect:/products/all";
     }
 
